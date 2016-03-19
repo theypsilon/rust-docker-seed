@@ -1,8 +1,9 @@
 .PHONY: docker-image docker-push docker-pull docker-test docker-run
 
+REGISTRY=localhost
 PROJECT=rustseed
 TAG=latest
-IMAGE=$(PROJECT):$(TAG)
+IMAGE=$(REGISTRY)/$(PROJECT):$(TAG)
 
 docker-image:
 	docker build -t $(IMAGE) .
@@ -13,11 +14,11 @@ docker-push:
 docker-pull:
 	docker pull $(IMAGE)
 
-NAME=rustseed_1
+NAME=rustseed_container
 PORT=6767
 
-docker-run:
-	docker run --name $(NAME) --rm -it -p $(PORT):6767 $(IMAGE)
+docker-run: docker-image
+	docker run --name $(NAME)_server --rm -it -p $(PORT):6767 $(IMAGE)
 
-docker-test:
+docker-test: docker-image
 	docker run --name $(NAME)_test --rm  $(IMAGE) cargo test
